@@ -40,14 +40,14 @@ export function Footer() {
         <div>
           <h4 className="text-[var(--gold)] font-semibold uppercase text-xs tracking-widest mb-4">Suivez-nous</h4>
           <div className="flex gap-3">
-            <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook" className="h-10 w-10 rounded-full bg-white/10 hover:bg-[var(--gold)] hover:text-[var(--navy-deep)] flex items-center justify-center transition">
+            <a href="https://www.facebook.com/share/1Cj1D72FNC/?mibextid=wwXIfr" target="_blank" rel="noreferrer" aria-label="Facebook (page principale)" className="h-10 w-10 rounded-full bg-white/10 hover:bg-[var(--gold)] hover:text-[var(--navy-deep)] flex items-center justify-center transition">
               <Facebook className="h-5 w-5" />
             </a>
-            <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube" className="h-10 w-10 rounded-full bg-white/10 hover:bg-[var(--gold)] hover:text-[var(--navy-deep)] flex items-center justify-center transition">
-              <Youtube className="h-5 w-5" />
+            <a href="https://www.facebook.com/share/18Mx2Nyz9k/?mibextid=wwXIfr" target="_blank" rel="noreferrer" aria-label="Facebook (page secondaire)" className="h-10 w-10 rounded-full bg-white/10 hover:bg-[var(--gold)] hover:text-[var(--navy-deep)] flex items-center justify-center transition">
+              <Facebook className="h-5 w-5" />
             </a>
-            <a href="https://tiktok.com" target="_blank" rel="noreferrer" aria-label="TikTok" className="h-10 w-10 rounded-full bg-white/10 hover:bg-[var(--gold)] hover:text-[var(--navy-deep)] flex items-center justify-center transition">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.78a8.23 8.23 0 0 0 4.83 1.55v-3.4a4.85 4.85 0 0 1-1.9-.24z"/></svg>
+            <a href="https://m.youtube.com/@dleandric1745" target="_blank" rel="noreferrer" aria-label="YouTube" className="h-10 w-10 rounded-full bg-white/10 hover:bg-[var(--gold)] hover:text-[var(--navy-deep)] flex items-center justify-center transition">
+              <Youtube className="h-5 w-5" />
             </a>
           </div>
           <p className="text-xs text-white/60 mt-6">📅 Dimanche 24 mai 2026 · 16h–18h</p>

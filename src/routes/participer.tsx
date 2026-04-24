@@ -177,10 +177,19 @@ function ParticiperPage() {
                   <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} maxLength={150} className="w-full px-4 py-3 rounded-xl border border-input bg-background focus:outline-none focus:border-[var(--gold)]" />
                   {errors.email && <p className="text-destructive text-sm mt-1">{errors.email}</p>}
                 </div>
-                <div className="bg-secondary/60 p-4 rounded-xl text-sm text-muted-foreground">
-                  💳 Frais d'inscription : à confirmer après validation. Le paiement sera intégré prochainement.
+                <div className="bg-[var(--gold)]/10 border-2 border-[var(--gold)]/40 p-4 rounded-xl text-sm">
+                  <p className="font-semibold text-foreground flex items-center gap-2">
+                    <CreditCard className="h-4 w-4 text-[var(--gold)]" />
+                    Frais d'inscription : <span className="text-[var(--gold)] font-bold">3 000 FCFA</span>
+                  </p>
+                  <p className="text-foreground mt-1">
+                    Paiement via Mobile Money au <strong>655 81 63 62</strong> (Nghokeng David).
+                  </p>
+                  <p className="text-muted-foreground mt-1">
+                    ⚠️ Veuillez effectuer le paiement avant validation de votre inscription.
+                  </p>
                 </div>
-                <button type="submit" className="w-full px-8 py-4 rounded-full bg-gold-gradient text-[var(--gold-foreground)] font-semibold shadow-gold hover:scale-[1.02] transition-transform">
+                <button type="submit" className="w-full px-8 py-4 rounded-full bg-gold-gradient text-[var(--gold-foreground)] text-base font-bold shadow-gold hover:scale-[1.02] transition-transform">
                   Valider mon inscription
                 </button>
               </form>

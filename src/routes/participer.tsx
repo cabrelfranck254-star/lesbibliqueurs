@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
-import { CheckCircle2, XCircle, BookOpen, ArrowRight } from "lucide-react";
+import { CheckCircle2, XCircle, BookOpen, ArrowRight, Phone, AlertCircle, CreditCard } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/participer")({
   head: () => ({

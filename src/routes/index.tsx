@@ -46,11 +46,11 @@ function HomePage() {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Link to="/participer" className="inline-flex items-center gap-2 px-7 py-4 rounded-full bg-gold-gradient text-[var(--gold-foreground)] font-semibold shadow-gold hover:scale-105 transition-transform">
-                Participer
+              <Link to="/participer" className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gold-gradient text-[var(--gold-foreground)] text-base font-bold shadow-gold hover:scale-105 transition-transform">
+                Devenir bibliqueur
               </Link>
-              <Link to="/billetterie" className="inline-flex items-center gap-2 px-7 py-4 rounded-full bg-white/10 backdrop-blur border border-white/30 text-white font-semibold hover:bg-white/20 transition">
-                S'inscrire
+              <Link to="/billetterie" className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-[var(--navy-deep)] text-base font-bold hover:bg-white/90 hover:scale-105 transition shadow-lg">
+                Réserver une place maintenant
               </Link>
               <Link to="/competitions" className="inline-flex items-center gap-2 px-7 py-4 rounded-full text-white font-semibold hover:text-[var(--gold)] transition">
                 Voir les compétitions →

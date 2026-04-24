@@ -58,6 +58,10 @@ function ParticiperPage() {
     }
     setErrors({});
     setStep("done");
+    toast.success("Votre inscription a été prise en compte.", {
+      description: "Veuillez finaliser le paiement au 655 81 63 62 (Nghokeng David) pour valider votre place.",
+      duration: 8000,
+    });
   }
 
   return (

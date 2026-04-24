@@ -36,6 +36,12 @@ export const Route = createRootRoute({
       { name: "author", content: "Les Bibliqueurs" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "Les Bibliqueurs — Émission chrétienne interactive" },
+      { name: "twitter:title", content: "Les Bibliqueurs — Émission chrétienne interactive" },
+      { property: "og:description", content: "L'émission chrétienne interactive basée sur les jeux et compétitions bibliques. Devenez Bibliqueur et participez en direct." },
+      { name: "twitter:description", content: "L'émission chrétienne interactive basée sur les jeux et compétitions bibliques. Devenez Bibliqueur et participez en direct." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/8TmxZHrbmFMylTuf208w2v7UVMn2/social-images/social-1777050444674-1000059486.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/8TmxZHrbmFMylTuf208w2v7UVMn2/social-images/social-1777050444674-1000059486.webp" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

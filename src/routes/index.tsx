@@ -151,8 +151,11 @@ function HomePage() {
                 lumière de la compétition.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
-                <Link to="/participer" className="px-8 py-4 rounded-full bg-gold-gradient text-[var(--gold-foreground)] font-semibold shadow-gold hover:scale-105 transition-transform">
-                  S'inscrire maintenant
+                <Link to="/billetterie" className="px-8 py-4 rounded-full bg-gold-gradient text-[var(--gold-foreground)] font-bold shadow-gold hover:scale-105 transition-transform">
+                  Réserver une place maintenant
+                </Link>
+                <Link to="/participer" className="px-8 py-4 rounded-full bg-white text-[var(--navy-deep)] font-bold hover:scale-105 transition shadow-lg">
+                  Devenir bibliqueur
                 </Link>
                 <Link to="/dons" className="px-8 py-4 rounded-full bg-white/10 backdrop-blur border border-white/30 text-white font-semibold hover:bg-white/20 transition inline-flex items-center gap-2">
                   <Heart className="h-4 w-4" /> Soutenir l'œuvre

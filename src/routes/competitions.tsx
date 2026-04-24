@@ -31,38 +31,80 @@ function CompetitionsPage() {
       </section>
 
       <section className="py-24">
-        <div className="container-custom">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="text-xs uppercase tracking-[0.25em] text-[var(--gold)] font-semibold">Édition inaugurale</span>
-            <h2 className="font-display text-4xl md:text-5xl text-primary mt-3 mb-4">Première édition</h2>
-            <p className="text-muted-foreground text-lg">
-              Découvrez l'intégralité de la toute première compétition des Bibliqueurs, un moment historique
-              de partage, de défi et de célébration de la Parole.
-            </p>
-          </div>
+        <div className="container-custom space-y-20">
+          {/* Première édition */}
+          <div>
+            <div className="text-center max-w-2xl mx-auto mb-10">
+              <span className="text-xs uppercase tracking-[0.25em] text-[var(--gold)] font-semibold">Édition inaugurale</span>
+              <h2 className="font-display text-4xl md:text-5xl text-primary mt-3 mb-4">Première édition</h2>
+              <p className="text-muted-foreground text-lg">
+                Découvrez l'intégralité de la toute première compétition des Bibliqueurs, un moment historique
+                de partage, de défi et de célébration de la Parole.
+              </p>
+            </div>
 
-          <div className="max-w-4xl mx-auto">
-            <div className="relative rounded-2xl overflow-hidden shadow-elegant border border-border bg-card">
-              <div className="aspect-video w-full">
-                <iframe
-                  src="https://www.youtube.com/embed/RuIRwe65Ihw"
-                  title="Première édition — Les Bibliqueurs"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="w-full h-full"
-                  loading="lazy"
-                />
+            <div className="max-w-4xl mx-auto">
+              <div className="relative rounded-2xl overflow-hidden shadow-elegant border border-border bg-card">
+                <div className="aspect-video w-full">
+                  <iframe
+                    src="https://www.youtube.com/embed/RuIRwe65Ihw"
+                    title="Première édition — Les Bibliqueurs"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    className="w-full h-full"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+              <div className="text-center mt-6">
+                <a
+                  href="https://youtu.be/RuIRwe65Ihw"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-[var(--gold)] hover:underline font-semibold"
+                >
+                  Ouvrir sur YouTube ↗
+                </a>
               </div>
             </div>
-            <div className="text-center mt-6">
-              <a
-                href="https://youtu.be/RuIRwe65Ihw"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 text-[var(--gold)] hover:underline font-semibold"
-              >
-                Ouvrir sur YouTube ↗
-              </a>
+          </div>
+
+          {/* Deuxième édition */}
+          <div>
+            <div className="text-center max-w-2xl mx-auto mb-10">
+              <span className="text-xs uppercase tracking-[0.25em] text-[var(--gold)] font-semibold">Édition suivante</span>
+              <h2 className="font-display text-4xl md:text-5xl text-primary mt-3 mb-4">Deuxième édition</h2>
+              <p className="text-muted-foreground text-lg">
+                Revivez la deuxième compétition des Bibliqueurs diffusée sur Facebook Live, une soirée
+                intense de quiz et de communion.
+              </p>
+            </div>
+
+            <div className="max-w-4xl mx-auto">
+              <div className="relative rounded-2xl overflow-hidden shadow-elegant border border-border bg-card">
+                <div className="aspect-video w-full">
+                  <iframe
+                    src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fshare%2Fv%2F1Ec3vuVs6h%2F&show_text=false&autoplay=false"
+                    title="Deuxième édition — Les Bibliqueurs"
+                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                    allowFullScreen
+                    scrolling="no"
+                    frameBorder="0"
+                    className="w-full h-full"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+              <div className="text-center mt-6">
+                <a
+                  href="https://www.facebook.com/share/v/1Ec3vuVs6h/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-[var(--gold)] hover:underline font-semibold"
+                >
+                  Ouvrir sur Facebook ↗
+                </a>
+              </div>
             </div>
           </div>
         </div>

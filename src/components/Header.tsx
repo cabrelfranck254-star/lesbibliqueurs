@@ -9,7 +9,7 @@ const navItems = [
   { to: "/participer", label: "Devenir Bibliqueur" },
   { to: "/billetterie", label: "Billetterie" },
   { to: "/competitions", label: "Compétitions" },
-  { to: "/dons", label: "Faire un don" },
+  { to: "/dons", label: "Collecte" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
@@ -42,10 +42,10 @@ export function Header() {
         </nav>
 
         <Link
-          to="/participer"
-          className="hidden lg:inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-gold-gradient text-[var(--gold-foreground)] text-sm font-semibold shadow-gold hover:scale-105 transition-transform"
+          to="/billetterie"
+          className="hidden lg:inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-gold-gradient text-[var(--gold-foreground)] text-sm font-bold shadow-gold hover:scale-105 transition-transform"
         >
-          Participer
+          Réserver une place
         </Link>
 
         <button onClick={() => setOpen(!open)} className="lg:hidden p-2 text-primary" aria-label="Menu">

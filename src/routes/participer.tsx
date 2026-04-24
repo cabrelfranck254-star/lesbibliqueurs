@@ -74,6 +74,47 @@ function ParticiperPage() {
         </div>
       </section>
 
+      {/* Encadré frais d'inscription */}
+      <section className="py-10 bg-[var(--gold)]/10 border-b-2 border-[var(--gold)]/30">
+        <div className="container-custom max-w-3xl">
+          <div className="bg-card rounded-2xl p-6 md:p-8 border-2 border-[var(--gold)] shadow-gold">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="h-12 w-12 rounded-xl bg-gold-gradient flex items-center justify-center flex-shrink-0 shadow-gold">
+                <CreditCard className="h-6 w-6 text-[var(--gold-foreground)]" />
+              </div>
+              <div className="flex-1">
+                <h2 className="font-display text-2xl text-primary font-bold">Frais d'inscription pour devenir bibliqueur</h2>
+                <p className="text-3xl font-display text-[var(--gold)] font-bold mt-1">3 000 FCFA</p>
+                <p className="text-xs text-muted-foreground mt-1">(Montant indicatif — modifiable)</p>
+              </div>
+            </div>
+            <div className="bg-secondary/60 rounded-xl p-4 mb-4 text-sm">
+              <p className="font-semibold text-foreground flex items-center gap-2 mb-1">
+                <Phone className="h-4 w-4 text-[var(--gold)]" />
+                Le paiement se fait via le numéro : <a href="tel:655816362" className="text-[var(--gold)] underline">655 81 63 62</a>
+              </p>
+              <p className="text-foreground"><strong>Nom :</strong> Nghokeng David — Mobile Money / Orange Money</p>
+              <p className="text-muted-foreground mt-2 flex items-start gap-1">
+                <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                Veuillez effectuer le paiement avant validation de votre inscription.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                toast.info("Paiement par Mobile Money", {
+                  description: "Composez le transfert vers 655 81 63 62 (Nghokeng David), puis envoyez-nous la preuve sur WhatsApp.",
+                  duration: 9000,
+                });
+                window.open("https://wa.me/237655816362?text=Bonjour%2C%20je%20souhaite%20payer%20mes%20frais%20d%27inscription%20pour%20devenir%20Bibliqueur.", "_blank");
+              }}
+              className="w-full py-4 rounded-full bg-gold-gradient text-[var(--gold-foreground)] text-base font-bold shadow-gold hover:scale-[1.02] transition-transform inline-flex items-center justify-center gap-2"
+            >
+              <CreditCard className="h-5 w-5" /> Payer maintenant
+            </button>
+          </div>
+        </div>
+      </section>
+
       <section className="py-20">
         <div className="container-custom max-w-2xl">
           {step === "intro" && (

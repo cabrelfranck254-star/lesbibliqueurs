@@ -170,6 +170,8 @@ Merci de me confirmer la réservation 🙏`;
     setStep("select");
     setSelected(null);
     setFormData({ fullName: "", whatsapp: "", email: "", quantity: 1, city: "" });
+    setProofFile(null);
+    setProofPreview(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 

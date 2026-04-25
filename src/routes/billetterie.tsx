@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, Crown, Ticket, Sparkles, Phone, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { Check, Crown, Ticket, Sparkles, Phone, AlertCircle, ArrowLeft, MessageCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
 
 export const Route = createFileRoute("/billetterie")({
   head: () => ({
@@ -14,10 +16,23 @@ export const Route = createFileRoute("/billetterie")({
   component: BilletteriePage,
 });
 
-const tickets = [
+type Ticket = {
+  type: string;
+  price: string;
+  priceValue: number;
+  badge: string;
+  icon: typeof Ticket;
+  features: string[];
+  cta: string;
+  highlight: boolean;
+  free: boolean;
+};
+
+const tickets: Ticket[] = [
   {
     type: "Gratuit",
     price: "0 FCFA",
+    priceValue: 0,
     badge: "Inscription anticipée",
     icon: Ticket,
     features: ["Accès à la salle", "Place debout", "Programme officiel"],
@@ -28,6 +43,7 @@ const tickets = [
   {
     type: "Standard",
     price: "2 000 FCFA",
+    priceValue: 2000,
     badge: "Le plus populaire",
     icon: Sparkles,
     features: ["Accès à la salle", "Place assise garantie", "Collation incluse", "Programme officiel"],
@@ -38,6 +54,7 @@ const tickets = [
   {
     type: "VIP",
     price: "5 000 FCFA",
+    priceValue: 5000,
     badge: "Expérience premium",
     icon: Crown,
     features: ["Accès prioritaire", "Place VIP réservée", "Réception privée", "Photo souvenir", "Goodies Bibliqueurs"],
@@ -47,18 +64,70 @@ const tickets = [
   },
 ];
 
+const reservationSchema = z.object({
+  fullName: z.string().trim().min(2, "Nom trop court").max(100, "Nom trop long"),
+  whatsapp: z.string().trim().min(8, "Numéro WhatsApp invalide").max(20, "Numéro trop long"),
+  email: z.string().trim().email("Email invalide").max(255, "Email trop long").optional().or(z.literal("")),
+  quantity: z.number().min(1, "Minimum 1 place").max(20, "Maximum 20 places"),
+  city: z.string().trim().min(2, "Ville requise").max(100, "Ville trop longue"),
+});
+
+type Step = "select" | "form" | "payment";
+
 function BilletteriePage() {
-  function handleReserve(type: string, free: boolean) {
-    if (free) {
-      toast.success("Votre réservation a été prise en compte.", {
-        description: `Billet ${type} confirmé. Présentez-vous à l'entrée le jour J.`,
-      });
-    } else {
-      toast.success("Votre réservation a été prise en compte.", {
-        description: `Veuillez finaliser le paiement au 655 81 63 62 (Nghokeng David) pour valider votre billet ${type}.`,
-        duration: 8000,
-      });
+  const [step, setStep] = useState<Step>("select");
+  const [selected, setSelected] = useState<Ticket | null>(null);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    whatsapp: "",
+    email: "",
+    quantity: 1,
+    city: "",
+  });
+
+  function handleSelect(t: Ticket) {
+    setSelected(t);
+    setStep("form");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function handleSubmitForm(e: React.FormEvent) {
+    e.preventDefault();
+    const result = reservationSchema.safeParse(formData);
+    if (!result.success) {
+      toast.error(result.error.issues[0].message);
+      return;
     }
+    setStep("payment");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    toast.success("Formulaire validé !", {
+      description: selected?.free
+        ? "Votre place est réservée. Présentez-vous à l'entrée."
+        : "Suivez les instructions de paiement pour finaliser.",
+    });
+  }
+
+  function buildWhatsAppMessage() {
+    if (!selected) return "";
+    const total = selected.priceValue * formData.quantity;
+    const msg = `Bonjour, je souhaite finaliser ma réservation pour Les Bibliqueurs.
+    
+👤 Nom : ${formData.fullName}
+📱 WhatsApp : ${formData.whatsapp}
+${formData.email ? `📧 Email : ${formData.email}\n` : ""}🏙️ Ville : ${formData.city}
+🎟️ Forfait : ${selected.type}
+🔢 Nombre de places : ${formData.quantity}
+💰 Total à payer : ${total.toLocaleString("fr-FR")} FCFA
+
+J'effectuerai le paiement au 655 81 63 62 (Nghokeng David).`;
+    return encodeURIComponent(msg);
+  }
+
+  function resetFlow() {
+    setStep("select");
+    setSelected(null);
+    setFormData({ fullName: "", whatsapp: "", email: "", quantity: 1, city: "" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
@@ -66,97 +135,316 @@ function BilletteriePage() {
       <section className="bg-hero-gradient text-white py-20">
         <div className="container-custom text-center">
           <span className="text-xs uppercase tracking-[0.25em] text-[var(--gold)] font-semibold">Billetterie</span>
-          <h1 className="font-display text-5xl md:text-6xl mt-3 mb-4">Réservez votre place</h1>
+          <h1 className="font-display text-5xl md:text-6xl mt-3 mb-4">
+            {step === "select" && "Réservez votre place"}
+            {step === "form" && "Vos informations"}
+            {step === "payment" && "Finalisez votre réservation"}
+          </h1>
           <p className="text-white/85 max-w-xl mx-auto text-lg">
-            Trois formules pour vivre l'émission. Choisissez celle qui vous correspond.
+            {step === "select" && "Trois formules pour vivre l'émission. Choisissez celle qui vous correspond."}
+            {step === "form" && `Forfait sélectionné : ${selected?.type} · ${selected?.price}`}
+            {step === "payment" && "Dernière étape pour valider votre billet."}
           </p>
-          <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur border border-white/20 text-sm">
-            📅 Dim. 24 mai 2026 · 16h–18h · Salle BC de Deido, Douala
+
+          {/* Stepper */}
+          <div className="mt-8 flex items-center justify-center gap-2 md:gap-4 text-xs md:text-sm">
+            {[
+              { id: "select", label: "1. Forfait" },
+              { id: "form", label: "2. Formulaire" },
+              { id: "payment", label: "3. Paiement" },
+            ].map((s, i) => {
+              const order = ["select", "form", "payment"];
+              const active = order.indexOf(step) >= i;
+              return (
+                <div key={s.id} className="flex items-center gap-2">
+                  <div
+                    className={`px-3 py-1.5 rounded-full font-semibold transition ${
+                      active ? "bg-gold-gradient text-[var(--gold-foreground)]" : "bg-white/10 text-white/60"
+                    }`}
+                  >
+                    {s.label}
+                  </div>
+                  {i < 2 && <div className={`h-0.5 w-4 md:w-8 ${active ? "bg-[var(--gold)]" : "bg-white/20"}`} />}
+                </div>
+              );
+            })}
           </div>
+
+          {step === "select" && (
+            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur border border-white/20 text-sm">
+              📅 Dim. 24 mai 2026 · 16h–18h · Salle BC de Deido, Douala
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Encadré paiement bien visible */}
-      <section className="py-8 bg-[var(--gold)]/10 border-y-2 border-[var(--gold)]/30">
-        <div className="container-custom max-w-4xl">
-          <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
-            <div className="h-14 w-14 rounded-full bg-gold-gradient flex items-center justify-center flex-shrink-0 shadow-gold">
-              <Phone className="h-6 w-6 text-[var(--gold-foreground)]" />
+      {/* STEP 1: Sélection */}
+      {step === "select" && (
+        <>
+          <section className="py-8 bg-[var(--gold)]/10 border-y-2 border-[var(--gold)]/30">
+            <div className="container-custom max-w-4xl">
+              <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
+                <div className="h-14 w-14 rounded-full bg-gold-gradient flex items-center justify-center flex-shrink-0 shadow-gold">
+                  <Phone className="h-6 w-6 text-[var(--gold-foreground)]" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-display text-xl text-primary font-semibold">
+                    Le paiement se fait via le numéro : <a href="tel:655816362" className="text-[var(--gold)] underline">655 81 63 62</a>
+                  </p>
+                  <p className="text-foreground text-sm mt-1">
+                    <strong>Nom :</strong> Nghokeng David — Mobile Money / Orange Money
+                  </p>
+                  <p className="text-muted-foreground text-sm mt-1 flex items-center justify-center md:justify-start gap-1">
+                    <AlertCircle className="h-4 w-4" /> Sélectionnez d'abord votre forfait, remplissez le formulaire, puis suivez les instructions de paiement.
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="flex-1">
-              <p className="font-display text-xl text-primary font-semibold">
-                Le paiement se fait via le numéro : <a href="tel:655816362" className="text-[var(--gold)] underline">655 81 63 62</a>
-              </p>
-              <p className="text-foreground text-sm mt-1">
-                <strong>Nom :</strong> Nghokeng David — Mobile Money / Orange Money
-              </p>
-              <p className="text-muted-foreground text-sm mt-1 flex items-center justify-center md:justify-start gap-1">
-                <AlertCircle className="h-4 w-4" /> Veuillez effectuer le paiement avant validation de votre inscription.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+          </section>
 
-      <section className="py-24">
-        <div className="container-custom grid md:grid-cols-3 gap-8">
-          {tickets.map((t) => (
-            <div
-              key={t.type}
-              className={`relative p-8 rounded-3xl border-2 transition-all hover:scale-[1.02] ${
-                t.highlight
-                  ? "bg-hero-gradient text-white border-[var(--gold)] shadow-gold"
-                  : "bg-card border-border hover:border-[var(--gold)]/50 shadow-elegant"
-              }`}
+          <section className="py-24">
+            <div className="container-custom grid md:grid-cols-3 gap-8">
+              {tickets.map((t) => (
+                <div
+                  key={t.type}
+                  className={`relative p-8 rounded-3xl border-2 transition-all hover:scale-[1.02] ${
+                    t.highlight
+                      ? "bg-hero-gradient text-white border-[var(--gold)] shadow-gold"
+                      : "bg-card border-border hover:border-[var(--gold)]/50 shadow-elegant"
+                  }`}
+                >
+                  {t.highlight && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gold-gradient text-[var(--gold-foreground)] text-xs font-bold uppercase tracking-wider">
+                      {t.badge}
+                    </div>
+                  )}
+                  <div className={`h-14 w-14 rounded-xl flex items-center justify-center mb-6 ${t.highlight ? "bg-[var(--gold)]" : "bg-gold-gradient"}`}>
+                    <t.icon className="h-7 w-7 text-[var(--gold-foreground)]" />
+                  </div>
+                  <h3 className={`font-display text-3xl mb-2 ${t.highlight ? "text-white" : "text-primary"}`}>{t.type}</h3>
+                  {!t.highlight && <div className="text-xs uppercase tracking-widest text-[var(--gold)] font-semibold mb-3">{t.badge}</div>}
+                  <div className={`font-display text-5xl font-bold mb-6 ${t.highlight ? "text-gold-gradient" : "text-primary"}`}>{t.price}</div>
+
+                  <ul className="space-y-3 mb-8">
+                    {t.features.map((f) => (
+                      <li key={f} className={`flex items-start gap-2 text-sm ${t.highlight ? "text-white/90" : "text-foreground"}`}>
+                        <Check className="h-5 w-5 flex-shrink-0 text-[var(--gold)]" />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={() => handleSelect(t)}
+                    className={`w-full py-4 rounded-full text-base font-bold transition ${
+                      t.highlight
+                        ? "bg-gold-gradient text-[var(--gold-foreground)] shadow-gold hover:scale-105"
+                        : "bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-105"
+                    }`}
+                  >
+                    {t.cta}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
+        </>
+      )}
+
+      {/* STEP 2: Formulaire */}
+      {step === "form" && selected && (
+        <section className="py-16 md:py-24">
+          <div className="container-custom max-w-2xl">
+            <button
+              onClick={() => setStep("select")}
+              className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition"
             >
-              {t.highlight && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gold-gradient text-[var(--gold-foreground)] text-xs font-bold uppercase tracking-wider">
-                  {t.badge}
+              <ArrowLeft className="h-4 w-4" /> Changer de forfait
+            </button>
+
+            <div className="bg-card border-2 border-border rounded-3xl p-8 md:p-10 shadow-elegant">
+              <div className="flex items-center gap-4 mb-8 pb-6 border-b border-border">
+                <div className="h-14 w-14 rounded-xl bg-gold-gradient flex items-center justify-center">
+                  <selected.icon className="h-7 w-7 text-[var(--gold-foreground)]" />
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-[var(--gold)] font-semibold">Forfait choisi</p>
+                  <h2 className="font-display text-2xl text-primary">{selected.type} · {selected.price}</h2>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmitForm} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold text-foreground mb-2">Nom complet *</label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={100}
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-border bg-background focus:border-[var(--gold)] focus:outline-none transition"
+                    placeholder="Jean Dupont"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-foreground mb-2">Numéro WhatsApp *</label>
+                  <input
+                    type="tel"
+                    required
+                    maxLength={20}
+                    value={formData.whatsapp}
+                    onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-border bg-background focus:border-[var(--gold)] focus:outline-none transition"
+                    placeholder="6XX XX XX XX"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-foreground mb-2">Email (optionnel)</label>
+                  <input
+                    type="email"
+                    maxLength={255}
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-border bg-background focus:border-[var(--gold)] focus:outline-none transition"
+                    placeholder="vous@email.com"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-foreground mb-2">Ville *</label>
+                    <input
+                      type="text"
+                      required
+                      maxLength={100}
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-border bg-background focus:border-[var(--gold)] focus:outline-none transition"
+                      placeholder="Douala"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-foreground mb-2">Nombre de places *</label>
+                    <input
+                      type="number"
+                      required
+                      min={1}
+                      max={20}
+                      value={formData.quantity}
+                      onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 1 })}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-border bg-background focus:border-[var(--gold)] focus:outline-none transition"
+                    />
+                  </div>
+                </div>
+
+                {!selected.free && (
+                  <div className="bg-secondary/60 rounded-xl p-4 flex items-center justify-between">
+                    <span className="text-foreground font-semibold">Total à payer :</span>
+                    <span className="font-display text-2xl text-[var(--gold)] font-bold">
+                      {(selected.priceValue * formData.quantity).toLocaleString("fr-FR")} FCFA
+                    </span>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full py-4 rounded-full bg-gold-gradient text-[var(--gold-foreground)] font-bold text-base shadow-gold hover:scale-[1.02] transition"
+                >
+                  Continuer vers le paiement →
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* STEP 3: Paiement */}
+      {step === "payment" && selected && (
+        <section className="py-16 md:py-24">
+          <div className="container-custom max-w-2xl">
+            <div className="bg-card border-2 border-[var(--gold)] rounded-3xl p-8 md:p-10 shadow-gold">
+              <div className="text-center mb-8">
+                <div className="inline-flex h-16 w-16 rounded-full bg-gold-gradient items-center justify-center mb-4 shadow-gold">
+                  <CheckCircle2 className="h-8 w-8 text-[var(--gold-foreground)]" />
+                </div>
+                <h2 className="font-display text-3xl text-primary mb-2">
+                  {selected.free ? "Réservation enregistrée !" : "Réservation enregistrée !"}
+                </h2>
+                <p className="text-muted-foreground">
+                  Bonjour <strong className="text-foreground">{formData.fullName}</strong>, voici les instructions pour finaliser.
+                </p>
+              </div>
+
+              {/* Récap */}
+              <div className="bg-secondary/60 rounded-2xl p-6 mb-6 space-y-2 text-sm">
+                <div className="flex justify-between"><span className="text-muted-foreground">Forfait :</span><strong className="text-foreground">{selected.type}</strong></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Nombre de places :</span><strong className="text-foreground">{formData.quantity}</strong></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Ville :</span><strong className="text-foreground">{formData.city}</strong></div>
+                {!selected.free && (
+                  <div className="flex justify-between pt-2 mt-2 border-t border-border">
+                    <span className="text-foreground font-semibold">Total :</span>
+                    <strong className="text-[var(--gold)] text-lg">{(selected.priceValue * formData.quantity).toLocaleString("fr-FR")} FCFA</strong>
+                  </div>
+                )}
+              </div>
+
+              {selected.free ? (
+                <div className="bg-primary/5 border-2 border-primary/20 rounded-2xl p-6 mb-6">
+                  <h3 className="font-display text-xl text-primary mb-3">📍 Présentez-vous à l'entrée</h3>
+                  <p className="text-foreground text-sm leading-relaxed">
+                    Votre billet gratuit est confirmé. Rendez-vous le <strong>dimanche 24 mai 2026 dès 15h30</strong> à la Salle BC de Deido, Douala. Munissez-vous de votre nom complet pour la vérification.
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-[var(--gold)]/10 border-2 border-[var(--gold)]/40 rounded-2xl p-6 mb-6">
+                  <h3 className="font-display text-xl text-primary mb-4 flex items-center gap-2">
+                    <Phone className="h-5 w-5 text-[var(--gold)]" /> Instructions de paiement
+                  </h3>
+                  <ol className="space-y-3 text-sm text-foreground">
+                    <li className="flex gap-3">
+                      <span className="flex-shrink-0 h-6 w-6 rounded-full bg-gold-gradient text-[var(--gold-foreground)] flex items-center justify-center text-xs font-bold">1</span>
+                      <span>Effectuez le paiement de <strong className="text-[var(--gold)]">{(selected.priceValue * formData.quantity).toLocaleString("fr-FR")} FCFA</strong> via Mobile Money / Orange Money.</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="flex-shrink-0 h-6 w-6 rounded-full bg-gold-gradient text-[var(--gold-foreground)] flex items-center justify-center text-xs font-bold">2</span>
+                      <span>Numéro destinataire : <a href="tel:655816362" className="text-[var(--gold)] font-bold underline">655 81 63 62</a> — <strong>Nghokeng David</strong></span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="flex-shrink-0 h-6 w-6 rounded-full bg-gold-gradient text-[var(--gold-foreground)] flex items-center justify-center text-xs font-bold">3</span>
+                      <span>Cliquez sur le bouton ci-dessous pour nous envoyer la <strong>preuve de paiement</strong> sur WhatsApp.</span>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="flex-shrink-0 h-6 w-6 rounded-full bg-gold-gradient text-[var(--gold-foreground)] flex items-center justify-center text-xs font-bold">4</span>
+                      <span>Vous recevrez votre <strong>QR code de validation</strong> par retour WhatsApp.</span>
+                    </li>
+                  </ol>
                 </div>
               )}
-              <div className={`h-14 w-14 rounded-xl flex items-center justify-center mb-6 ${t.highlight ? "bg-[var(--gold)]" : "bg-gold-gradient"}`}>
-                <t.icon className="h-7 w-7 text-[var(--gold-foreground)]" />
-              </div>
-              <h3 className={`font-display text-3xl mb-2 ${t.highlight ? "text-white" : "text-primary"}`}>{t.type}</h3>
-              {!t.highlight && <div className="text-xs uppercase tracking-widest text-[var(--gold)] font-semibold mb-3">{t.badge}</div>}
-              <div className={`font-display text-5xl font-bold mb-6 ${t.highlight ? "text-gold-gradient" : "text-primary"}`}>{t.price}</div>
 
-              <ul className="space-y-3 mb-8">
-                {t.features.map((f) => (
-                  <li key={f} className={`flex items-start gap-2 text-sm ${t.highlight ? "text-white/90" : "text-foreground"}`}>
-                    <Check className="h-5 w-5 flex-shrink-0 text-[var(--gold)]" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
+              {/* Bouton WhatsApp en bas */}
+              <a
+                href={`https://wa.me/237655816362?text=${buildWhatsAppMessage()}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full inline-flex items-center justify-center gap-3 py-4 rounded-full bg-[#25D366] text-white font-bold text-base shadow-elegant hover:scale-[1.02] transition"
+              >
+                <MessageCircle className="h-5 w-5" />
+                Contactez-nous sur WhatsApp pour finaliser
+              </a>
 
               <button
-                onClick={() => handleReserve(t.type, t.free)}
-                className={`w-full py-4 rounded-full text-base font-bold transition ${
-                  t.highlight
-                    ? "bg-gold-gradient text-[var(--gold-foreground)] shadow-gold hover:scale-105"
-                    : "bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-105"
-                }`}
+                onClick={resetFlow}
+                className="w-full mt-3 py-3 rounded-full bg-secondary text-foreground font-semibold text-sm hover:bg-secondary/80 transition"
               >
-                {t.cta}
+                Faire une nouvelle réservation
               </button>
             </div>
-          ))}
-        </div>
-
-        <div className="container-custom max-w-3xl mt-16">
-          <div className="bg-secondary/60 rounded-2xl p-8 text-center">
-            <p className="text-foreground font-semibold mb-2">💳 Modalités de paiement</p>
-            <p className="text-muted-foreground text-sm">
-              Effectuez votre paiement via Mobile Money / Orange Money au{" "}
-              <a className="text-primary font-bold underline" href="tel:655816362">655 81 63 62</a> (Nghokeng David),
-              puis confirmez par WhatsApp au{" "}
-              <a className="text-primary font-bold underline" href="https://wa.me/237655816362">655 81 63 62</a>.
-              Un QR code de validation vous sera envoyé après confirmation du paiement.
-            </p>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </>
   );
 }

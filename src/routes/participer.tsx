@@ -84,8 +84,7 @@ function ParticiperPage() {
               </div>
               <div className="flex-1">
                 <h2 className="font-display text-2xl text-primary font-bold">Frais d'inscription pour devenir bibliqueur</h2>
-                <p className="text-3xl font-display text-[var(--gold)] font-bold mt-1">3 000 FCFA</p>
-                <p className="text-xs text-muted-foreground mt-1">(Montant indicatif — modifiable)</p>
+                <p className="text-3xl font-display text-[var(--gold)] font-bold mt-1">15 000 FCFA</p>
               </div>
             </div>
             <div className="bg-secondary/60 rounded-xl p-4 mb-4 text-sm">

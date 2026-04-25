@@ -84,6 +84,9 @@ function BilletteriePage() {
     quantity: 1,
     city: "",
   });
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [proofPreview, setProofPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleSelect(t: Ticket) {
     setSelected(t);
@@ -103,24 +106,64 @@ function BilletteriePage() {
     toast.success("Formulaire validé !", {
       description: selected?.free
         ? "Votre place est réservée. Présentez-vous à l'entrée."
-        : "Suivez les instructions de paiement pour finaliser.",
+        : "Suivez les instructions de paiement et joignez votre capture.",
     });
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Fichier trop volumineux (max 5 Mo)."); return; }
+    if (!file.type.startsWith("image/")) { toast.error("Veuillez sélectionner une image."); return; }
+    setProofFile(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => setProofPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  function removeProof() {
+    setProofFile(null);
+    setProofPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   function buildWhatsAppMessage() {
     if (!selected) return "";
     const total = selected.priceValue * formData.quantity;
-    const msg = `Bonjour, je souhaite finaliser ma réservation pour Les Bibliqueurs.
-    
-👤 Nom : ${formData.fullName}
-📱 WhatsApp : ${formData.whatsapp}
-${formData.email ? `📧 Email : ${formData.email}\n` : ""}🏙️ Ville : ${formData.city}
-🎟️ Forfait : ${selected.type}
-🔢 Nombre de places : ${formData.quantity}
-💰 Total à payer : ${total.toLocaleString("fr-FR")} FCFA
+    const msg = `🎟️ *NOUVELLE RÉSERVATION — LES BIBLIQUEURS*
 
-J'effectuerai le paiement au 655 81 63 62 (Nghokeng David).`;
+👤 *Nom :* ${formData.fullName}
+📱 *WhatsApp :* ${formData.whatsapp}
+${formData.email ? `📧 *Email :* ${formData.email}\n` : ""}🏙️ *Ville :* ${formData.city}
+
+🎫 *Forfait :* ${selected.type}
+🔢 *Nombre de places :* ${formData.quantity}
+💰 *Total :* ${total.toLocaleString("fr-FR")} FCFA
+
+${selected.free ? "✅ Billet gratuit — merci de valider mon inscription." : `📞 Versé au : 655 81 63 62 (Nghokeng David)\n📎 Je joins ci-dessous la capture d'écran de la preuve de paiement.`}
+
+Merci de me confirmer la réservation 🙏`;
     return encodeURIComponent(msg);
+  }
+
+  function handleSendWhatsApp() {
+    if (!selected?.free && !proofFile) {
+      toast.error("Veuillez d'abord joindre la capture d'écran de votre paiement.");
+      return;
+    }
+    if (proofFile) {
+      const url = URL.createObjectURL(proofFile);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `paiement-${formData.fullName.replace(/\s+/g, "-")}.${proofFile.name.split(".").pop()}`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Capture téléchargée !", {
+        description: "Joignez-la dans la conversation WhatsApp qui s'ouvre.",
+        duration: 8000,
+      });
+    }
+    window.open(`https://wa.me/237655816362?text=${buildWhatsAppMessage()}`, "_blank");
   }
 
   function resetFlow() {

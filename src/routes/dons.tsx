@@ -7,9 +7,9 @@ import donsImg from "@/assets/dons.jpg";
 export const Route = createFileRoute("/dons")({
   head: () => ({
     meta: [
-      { title: "Collecte — Soutenez Les Bibliqueurs par votre contribution" },
-      { name: "description", content: "Soutenez Les Bibliqueurs par une contribution libre. Votre générosité fait grandir l'œuvre et la diffusion de la Parole." },
-      { property: "og:title", content: "Collecte — Les Bibliqueurs" },
+      { title: "Offrandes — Soutenez Les Bibliqueurs par votre contribution" },
+      { name: "description", content: "Soutenez Les Bibliqueurs par une offrande libre. Votre générosité fait grandir l'œuvre et la diffusion de la Parole." },
+      { property: "og:title", content: "Offrandes — Les Bibliqueurs" },
       { property: "og:description", content: "Soutenez la mission. Contribuez librement." },
       { property: "og:image", content: "/dons.jpg" },
     ],
@@ -30,8 +30,8 @@ function DonsPage() {
       });
       return;
     }
-    toast.success("Votre contribution a été prise en compte.", {
-      description: `Merci ! Effectuez votre versement de ${m.toLocaleString()} FCFA au 655 81 63 62 (Nghokeng David) pour finaliser.`,
+      toast.success("Votre offrande a été prise en compte.", {
+        description: `Merci ! Effectuez votre versement de ${m.toLocaleString()} FCFA au 655 81 63 62 (Nghokeng David) pour finaliser.`,
       duration: 9000,
     });
     window.open(
@@ -47,7 +47,7 @@ function DonsPage() {
         <div className="absolute inset-0 bg-[var(--gradient-overlay)]" />
         <div className="container-custom relative z-10 text-center text-white">
           <Heart className="h-14 w-14 text-[var(--gold)] mx-auto mb-4" fill="currentColor" />
-          <h1 className="font-display text-5xl md:text-6xl mb-4">Collecte</h1>
+          <h1 className="font-display text-5xl md:text-6xl mb-4">Offrandes</h1>
           <p className="font-display italic text-2xl text-[var(--gold-soft)] mb-2">« Que chacun donne comme il l'a résolu en son cœur »</p>
           <p className="text-sm text-white/70">— 2 Corinthiens 9:7</p>
         </div>

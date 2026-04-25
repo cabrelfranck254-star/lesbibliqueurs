@@ -467,16 +467,51 @@ Merci de me confirmer la réservation 🙏`;
                 </div>
               )}
 
+              {/* Upload preuve (sauf gratuit) */}
+              {!selected.free && (
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+                    <ImageIcon className="h-4 w-4 text-[var(--gold)]" />
+                    Capture d'écran de la preuve de paiement *
+                  </label>
+
+                  {!proofPreview ? (
+                    <label className="block cursor-pointer border-2 border-dashed border-[var(--gold)]/50 rounded-xl p-8 text-center hover:bg-[var(--gold)]/5 transition">
+                      <Upload className="h-8 w-8 text-[var(--gold)] mx-auto mb-2" />
+                      <p className="text-sm font-semibold text-foreground">Cliquez pour importer</p>
+                      <p className="text-xs text-muted-foreground mt-1">JPG, PNG · max 5 Mo</p>
+                      <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                    </label>
+                  ) : (
+                    <div className="relative rounded-xl overflow-hidden border-2 border-[var(--gold)]">
+                      <img src={proofPreview} alt="Aperçu preuve" className="w-full max-h-64 object-contain bg-secondary/30" />
+                      <button onClick={removeProof} className="absolute top-2 right-2 h-8 w-8 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow-lg hover:scale-110 transition" aria-label="Retirer">
+                        <X className="h-4 w-4" />
+                      </button>
+                      <div className="px-3 py-2 bg-green-50 border-t border-green-200 text-xs text-green-800 flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4" />
+                        Capture prête : {proofFile?.name}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Bouton WhatsApp en bas */}
-              <a
-                href={`https://wa.me/237655816362?text=${buildWhatsAppMessage()}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full inline-flex items-center justify-center gap-3 py-4 rounded-full bg-[#25D366] text-white font-bold text-base shadow-elegant hover:scale-[1.02] transition"
+              <button
+                onClick={handleSendWhatsApp}
+                disabled={!selected.free && !proofFile}
+                className="w-full inline-flex items-center justify-center gap-3 py-4 rounded-full bg-[#25D366] text-white font-bold text-base shadow-elegant hover:scale-[1.02] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 <MessageCircle className="h-5 w-5" />
-                Contactez-nous sur WhatsApp pour finaliser
-              </a>
+                {selected.free ? "Confirmer sur WhatsApp" : "Envoyer sur WhatsApp pour finaliser"}
+              </button>
+
+              {!selected.free && (
+                <p className="text-xs text-muted-foreground text-center mt-3">
+                  ℹ️ La capture sera téléchargée sur votre appareil. Joignez-la dans la conversation WhatsApp.
+                </p>
+              )}
 
               <button
                 onClick={resetFlow}

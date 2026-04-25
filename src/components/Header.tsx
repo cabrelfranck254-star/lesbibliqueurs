@@ -9,7 +9,7 @@ const navItems = [
   { to: "/participer", label: "Devenir Bibliqueur" },
   { to: "/billetterie", label: "Billetterie" },
   { to: "/competitions", label: "Compétitions" },
-  { to: "/dons", label: "Collecte" },
+  { to: "/dons", label: "Offrandes" },
   { to: "/contact", label: "Contact" },
 ] as const;
 

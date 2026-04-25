@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Check, Crown, Ticket, Sparkles, Phone, AlertCircle, ArrowLeft, MessageCircle, CheckCircle2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { Check, Crown, Ticket, Sparkles, Phone, AlertCircle, ArrowLeft, MessageCircle, CheckCircle2, Upload, Image as ImageIcon, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 

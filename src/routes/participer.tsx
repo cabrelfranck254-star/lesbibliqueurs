@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { z } from "zod";
-import { CheckCircle2, XCircle, BookOpen, ArrowRight, Phone, AlertCircle, CreditCard } from "lucide-react";
+import { CheckCircle2, XCircle, BookOpen, ArrowRight, Phone, AlertCircle, CreditCard, Upload, MessageCircle, Image as ImageIcon, X } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/participer")({
@@ -28,6 +28,7 @@ const formSchema = z.object({
   nom: z.string().trim().min(2, "Nom trop court").max(80),
   whatsapp: z.string().trim().min(8, "Numéro invalide").max(20),
   email: z.string().trim().email("Email invalide").max(150),
+  ville: z.string().trim().min(2, "Ville requise").max(80),
 });
 
 type Step = "intro" | "quiz" | "form" | "payment" | "done";
@@ -36,8 +37,11 @@ function ParticiperPage() {
   const [step, setStep] = useState<Step>("intro");
   const [answers, setAnswers] = useState<number[]>([]);
   const [current, setCurrent] = useState(0);
-  const [form, setForm] = useState({ nom: "", whatsapp: "", email: "" });
+  const [form, setForm] = useState({ nom: "", whatsapp: "", email: "", ville: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [proofPreview, setProofPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const score = answers.reduce((a, ans, i) => a + (ans === quiz[i].answer ? 1 : 0), 0);
   const passed = score >= 3;
@@ -61,18 +65,73 @@ function ParticiperPage() {
     setErrors({});
     setStep("payment");
     toast.success("Formulaire enregistré.", {
-      description: "Veuillez maintenant procéder au paiement des frais d'inscription pour valider votre place.",
-      duration: 7000,
+      description: "Procédez au paiement et joignez votre capture d'écran.",
+      duration: 6000,
     });
   }
 
-  function handlePay() {
-    toast.info("Paiement par Mobile Money", {
-      description: "Composez le transfert de 15 000 FCFA vers 655 81 63 62 (Nghokeng David), puis envoyez la preuve sur WhatsApp.",
-      duration: 9000,
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Fichier trop volumineux (max 5 Mo).");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Veuillez sélectionner une image (JPG, PNG).");
+      return;
+    }
+    setProofFile(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => setProofPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  function removeProof() {
+    setProofFile(null);
+    setProofPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  function buildWhatsAppMessage() {
+    return encodeURIComponent(
+`🎓 *NOUVELLE INSCRIPTION BIBLIQUEUR*
+
+👤 *Nom complet :* ${form.nom}
+📱 *WhatsApp :* ${form.whatsapp}
+📧 *Email :* ${form.email}
+🏙️ *Ville :* ${form.ville}
+
+📊 *Score au test :* ${score}/${quiz.length} ${passed ? "✅" : "⚠️"}
+
+💳 *Paiement effectué :* 15 000 FCFA
+📞 Vers : 655 81 63 62 (Nghokeng David)
+
+📎 Je joins ci-dessous la capture d'écran de la preuve de paiement.
+
+Merci de valider mon inscription.`
+    );
+  }
+
+  function handleSendWhatsApp() {
+    if (!proofFile) {
+      toast.error("Veuillez d'abord joindre votre capture d'écran de paiement.");
+      return;
+    }
+    // Téléchargement local de la preuve pour faciliter l'envoi sur WhatsApp
+    const url = URL.createObjectURL(proofFile);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `preuve-paiement-${form.nom.replace(/\s+/g, "-")}.${proofFile.name.split(".").pop()}`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    toast.success("Capture téléchargée !", {
+      description: "Joignez-la dans la conversation WhatsApp qui vient de s'ouvrir.",
+      duration: 8000,
     });
-    const msg = `Bonjour, je suis ${form.nom}. Je viens de remplir le formulaire pour devenir Bibliqueur et je souhaite payer les frais d'inscription de 15 000 FCFA.`;
-    window.open(`https://wa.me/237655816362?text=${encodeURIComponent(msg)}`, "_blank");
+
+    window.open(`https://wa.me/237655816362?text=${buildWhatsAppMessage()}`, "_blank");
     setStep("done");
   }
 
@@ -86,7 +145,6 @@ function ParticiperPage() {
             Suivez les 3 étapes : test de sélection, formulaire d'inscription, puis paiement.
           </p>
 
-          {/* Indicateur d'étapes */}
           <div className="flex items-center justify-center gap-2 md:gap-4 mt-8 text-xs md:text-sm">
             {[
               { key: "quiz", label: "1. Test", active: step === "intro" || step === "quiz" },
@@ -174,6 +232,11 @@ function ParticiperPage() {
                   <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} maxLength={150} className="w-full px-4 py-3 rounded-xl border border-input bg-background focus:outline-none focus:border-[var(--gold)]" />
                   {errors.email && <p className="text-destructive text-sm mt-1">{errors.email}</p>}
                 </div>
+                <div>
+                  <label className="block text-sm font-semibold text-foreground mb-2">Ville</label>
+                  <input value={form.ville} onChange={(e) => setForm({ ...form, ville: e.target.value })} maxLength={80} placeholder="Douala" className="w-full px-4 py-3 rounded-xl border border-input bg-background focus:outline-none focus:border-[var(--gold)]" />
+                  {errors.ville && <p className="text-destructive text-sm mt-1">{errors.ville}</p>}
+                </div>
                 <button type="submit" className="w-full px-8 py-4 rounded-full bg-gold-gradient text-[var(--gold-foreground)] text-base font-bold shadow-gold hover:scale-[1.02] transition-transform inline-flex items-center justify-center gap-2">
                   Continuer vers le paiement <ArrowRight className="h-4 w-4" />
                 </button>
@@ -196,7 +259,7 @@ function ParticiperPage() {
               <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-5 flex items-start gap-3">
                 <CheckCircle2 className="h-5 w-5 text-green-700 flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-green-800">
-                  <strong>Inscription enregistrée pour {form.nom}.</strong> Il ne reste plus qu'à payer les frais pour valider votre place.
+                  <strong>Inscription enregistrée pour {form.nom}.</strong> Il ne reste plus qu'à payer pour valider votre place.
                 </div>
               </div>
 
@@ -214,17 +277,60 @@ function ParticiperPage() {
                 <p className="text-amber-900 flex items-start gap-2">
                   <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
                   <span>
-                    <strong>Instructions :</strong> Effectuez le transfert au numéro indiqué, puis cliquez sur le bouton ci-dessous pour nous envoyer la preuve de paiement par WhatsApp. Votre inscription sera validée dès réception.
+                    <strong>Étapes :</strong> 1) Effectuez le transfert. 2) Faites une capture d'écran de la confirmation. 3) Importez-la ci-dessous. 4) Cliquez sur le bouton WhatsApp pour envoyer toutes les infos automatiquement.
                   </span>
                 </p>
               </div>
 
+              {/* Upload preuve de paiement */}
+              <div className="mb-6">
+                <label className="block text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4 text-[var(--gold)]" />
+                  Capture d'écran de la preuve de paiement *
+                </label>
+
+                {!proofPreview ? (
+                  <label className="block cursor-pointer border-2 border-dashed border-[var(--gold)]/50 rounded-xl p-8 text-center hover:bg-[var(--gold)]/5 transition">
+                    <Upload className="h-8 w-8 text-[var(--gold)] mx-auto mb-2" />
+                    <p className="text-sm font-semibold text-foreground">Cliquez pour importer</p>
+                    <p className="text-xs text-muted-foreground mt-1">JPG, PNG · max 5 Mo</p>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </label>
+                ) : (
+                  <div className="relative rounded-xl overflow-hidden border-2 border-[var(--gold)]">
+                    <img src={proofPreview} alt="Aperçu preuve de paiement" className="w-full max-h-64 object-contain bg-secondary/30" />
+                    <button
+                      onClick={removeProof}
+                      className="absolute top-2 right-2 h-8 w-8 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow-lg hover:scale-110 transition"
+                      aria-label="Retirer la capture"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                    <div className="px-3 py-2 bg-green-50 border-t border-green-200 text-xs text-green-800 flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4" />
+                      Capture prête à être envoyée : {proofFile?.name}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <button
-                onClick={handlePay}
-                className="w-full py-4 rounded-full bg-gold-gradient text-[var(--gold-foreground)] text-base font-bold shadow-gold hover:scale-[1.02] transition-transform inline-flex items-center justify-center gap-2"
+                onClick={handleSendWhatsApp}
+                disabled={!proofFile}
+                className="w-full py-4 rounded-full bg-[#25D366] text-white text-base font-bold shadow-elegant hover:scale-[1.02] transition-transform inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                <CreditCard className="h-5 w-5" /> Payer 15 000 FCFA maintenant
+                <MessageCircle className="h-5 w-5" /> Envoyer sur WhatsApp pour finaliser
               </button>
+
+              <p className="text-xs text-muted-foreground text-center mt-3">
+                ℹ️ La capture sera téléchargée sur votre appareil. Joignez-la à la conversation WhatsApp qui s'ouvre.
+              </p>
 
               <button
                 onClick={() => setStep("form")}
@@ -245,10 +351,10 @@ function ParticiperPage() {
                 Bienvenue dans la communauté des Bibliqueurs, <strong>{form.nom}</strong>.
               </p>
               <p className="text-muted-foreground mb-8">
-                Pensez à finaliser le paiement de <strong>15 000 FCFA</strong> au <strong>655 81 63 62</strong> (Nghokeng David) si ce n'est pas déjà fait, et à envoyer la preuve sur WhatsApp.
+                N'oubliez pas de <strong>joindre la capture téléchargée</strong> dans WhatsApp pour finaliser la validation de votre paiement.
               </p>
               <a href="https://wa.me/237655816362" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition">
-                Nous contacter sur WhatsApp
+                <MessageCircle className="h-4 w-4" /> Rouvrir WhatsApp
               </a>
             </div>
           )}

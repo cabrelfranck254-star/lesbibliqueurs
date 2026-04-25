@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Check, Crown, Ticket, Sparkles, Phone, AlertCircle, ArrowLeft, MessageCircle, CheckCircle2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { Check, Crown, Ticket, Sparkles, Phone, AlertCircle, ArrowLeft, MessageCircle, CheckCircle2, Upload, Image as ImageIcon, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -84,6 +84,9 @@ function BilletteriePage() {
     quantity: 1,
     city: "",
   });
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [proofPreview, setProofPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleSelect(t: Ticket) {
     setSelected(t);
@@ -103,30 +106,72 @@ function BilletteriePage() {
     toast.success("Formulaire validé !", {
       description: selected?.free
         ? "Votre place est réservée. Présentez-vous à l'entrée."
-        : "Suivez les instructions de paiement pour finaliser.",
+        : "Suivez les instructions de paiement et joignez votre capture.",
     });
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Fichier trop volumineux (max 5 Mo)."); return; }
+    if (!file.type.startsWith("image/")) { toast.error("Veuillez sélectionner une image."); return; }
+    setProofFile(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => setProofPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  function removeProof() {
+    setProofFile(null);
+    setProofPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   function buildWhatsAppMessage() {
     if (!selected) return "";
     const total = selected.priceValue * formData.quantity;
-    const msg = `Bonjour, je souhaite finaliser ma réservation pour Les Bibliqueurs.
-    
-👤 Nom : ${formData.fullName}
-📱 WhatsApp : ${formData.whatsapp}
-${formData.email ? `📧 Email : ${formData.email}\n` : ""}🏙️ Ville : ${formData.city}
-🎟️ Forfait : ${selected.type}
-🔢 Nombre de places : ${formData.quantity}
-💰 Total à payer : ${total.toLocaleString("fr-FR")} FCFA
+    const msg = `🎟️ *NOUVELLE RÉSERVATION — LES BIBLIQUEURS*
 
-J'effectuerai le paiement au 655 81 63 62 (Nghokeng David).`;
+👤 *Nom :* ${formData.fullName}
+📱 *WhatsApp :* ${formData.whatsapp}
+${formData.email ? `📧 *Email :* ${formData.email}\n` : ""}🏙️ *Ville :* ${formData.city}
+
+🎫 *Forfait :* ${selected.type}
+🔢 *Nombre de places :* ${formData.quantity}
+💰 *Total :* ${total.toLocaleString("fr-FR")} FCFA
+
+${selected.free ? "✅ Billet gratuit — merci de valider mon inscription." : `📞 Versé au : 655 81 63 62 (Nghokeng David)\n📎 Je joins ci-dessous la capture d'écran de la preuve de paiement.`}
+
+Merci de me confirmer la réservation 🙏`;
     return encodeURIComponent(msg);
+  }
+
+  function handleSendWhatsApp() {
+    if (!selected?.free && !proofFile) {
+      toast.error("Veuillez d'abord joindre la capture d'écran de votre paiement.");
+      return;
+    }
+    if (proofFile) {
+      const url = URL.createObjectURL(proofFile);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `paiement-${formData.fullName.replace(/\s+/g, "-")}.${proofFile.name.split(".").pop()}`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Capture téléchargée !", {
+        description: "Joignez-la dans la conversation WhatsApp qui s'ouvre.",
+        duration: 8000,
+      });
+    }
+    window.open(`https://wa.me/237655816362?text=${buildWhatsAppMessage()}`, "_blank");
   }
 
   function resetFlow() {
     setStep("select");
     setSelected(null);
     setFormData({ fullName: "", whatsapp: "", email: "", quantity: 1, city: "" });
+    setProofFile(null);
+    setProofPreview(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -424,16 +469,51 @@ J'effectuerai le paiement au 655 81 63 62 (Nghokeng David).`;
                 </div>
               )}
 
+              {/* Upload preuve (sauf gratuit) */}
+              {!selected.free && (
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+                    <ImageIcon className="h-4 w-4 text-[var(--gold)]" />
+                    Capture d'écran de la preuve de paiement *
+                  </label>
+
+                  {!proofPreview ? (
+                    <label className="block cursor-pointer border-2 border-dashed border-[var(--gold)]/50 rounded-xl p-8 text-center hover:bg-[var(--gold)]/5 transition">
+                      <Upload className="h-8 w-8 text-[var(--gold)] mx-auto mb-2" />
+                      <p className="text-sm font-semibold text-foreground">Cliquez pour importer</p>
+                      <p className="text-xs text-muted-foreground mt-1">JPG, PNG · max 5 Mo</p>
+                      <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                    </label>
+                  ) : (
+                    <div className="relative rounded-xl overflow-hidden border-2 border-[var(--gold)]">
+                      <img src={proofPreview} alt="Aperçu preuve" className="w-full max-h-64 object-contain bg-secondary/30" />
+                      <button onClick={removeProof} className="absolute top-2 right-2 h-8 w-8 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow-lg hover:scale-110 transition" aria-label="Retirer">
+                        <X className="h-4 w-4" />
+                      </button>
+                      <div className="px-3 py-2 bg-green-50 border-t border-green-200 text-xs text-green-800 flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4" />
+                        Capture prête : {proofFile?.name}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Bouton WhatsApp en bas */}
-              <a
-                href={`https://wa.me/237655816362?text=${buildWhatsAppMessage()}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full inline-flex items-center justify-center gap-3 py-4 rounded-full bg-[#25D366] text-white font-bold text-base shadow-elegant hover:scale-[1.02] transition"
+              <button
+                onClick={handleSendWhatsApp}
+                disabled={!selected.free && !proofFile}
+                className="w-full inline-flex items-center justify-center gap-3 py-4 rounded-full bg-[#25D366] text-white font-bold text-base shadow-elegant hover:scale-[1.02] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 <MessageCircle className="h-5 w-5" />
-                Contactez-nous sur WhatsApp pour finaliser
-              </a>
+                {selected.free ? "Confirmer sur WhatsApp" : "Envoyer sur WhatsApp pour finaliser"}
+              </button>
+
+              {!selected.free && (
+                <p className="text-xs text-muted-foreground text-center mt-3">
+                  ℹ️ La capture sera téléchargée sur votre appareil. Joignez-la dans la conversation WhatsApp.
+                </p>
+              )}
 
               <button
                 onClick={resetFlow}

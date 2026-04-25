@@ -179,7 +179,7 @@ function ParticiperPage() {
                 <div className="bg-[var(--gold)]/10 border-2 border-[var(--gold)]/40 p-4 rounded-xl text-sm">
                   <p className="font-semibold text-foreground flex items-center gap-2">
                     <CreditCard className="h-4 w-4 text-[var(--gold)]" />
-                    Frais d'inscription : <span className="text-[var(--gold)] font-bold">3 000 FCFA</span>
+                    Frais d'inscription : <span className="text-[var(--gold)] font-bold">15 000 FCFA</span>
                   </p>
                   <p className="text-foreground mt-1">
                     Paiement via Mobile Money au <strong>655 81 63 62</strong> (Nghokeng David).

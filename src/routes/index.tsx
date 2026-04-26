@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Trophy, Users, Radio, Calendar, MapPin, Sparkles, BookOpen, Heart } from "lucide-react";
 import heroImg from "@/assets/hero-biblique.jpg";
 import competitionsImg from "@/assets/competitions.jpg";
+import logoBibliqueurs from "@/assets/logo-bibliqueurs.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,13 +28,20 @@ function HomePage() {
 
         <div className="container-custom relative z-10 py-20">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur border border-[var(--gold)]/30 mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur border border-[var(--gold)]/30 mb-4">
               <Sparkles className="h-4 w-4 text-[var(--gold)]" />
               <span className="text-xs uppercase tracking-[0.2em] text-[var(--gold-soft)]">Émission Chrétienne Interactive</span>
             </div>
 
-            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-semibold text-white leading-[0.95] mb-6">
-              Les <span className="text-gold-gradient italic">Bibliqueurs</span>
+            <h1 className="mb-6">
+              <span className="sr-only">Les Bibliqueurs</span>
+              <img
+                src={logoBibliqueurs}
+                alt="Logo Les Bibliqueurs — Bible ouverte avec croix dorée"
+                className="w-[280px] md:w-[420px] lg:w-[520px] h-auto drop-shadow-[0_8px_30px_rgba(212,175,55,0.35)]"
+                width={520}
+                height={340}
+              />
             </h1>
 
             <p className="font-display italic text-2xl md:text-3xl text-[var(--gold-soft)] mb-4">
@@ -98,7 +106,7 @@ function HomePage() {
           {[
             { n: "500+", l: "Bibliqueurs inscrits" },
             { n: "12", l: "Compétitions organisées" },
-            { n: "50K+", l: "Vues en direct" },
+            { n: "+800", l: "Vues en direct" },
             { n: "3", l: "Plateformes de diffusion" },
           ].map((s) => (
             <div key={s.l}>

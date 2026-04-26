@@ -28,17 +28,32 @@ export function Header() {
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="px-3 py-2 text-sm font-medium text-foreground/75 hover:text-primary rounded-md transition-colors"
-              activeProps={{ className: "px-3 py-2 text-sm font-semibold text-primary rounded-md bg-secondary" }}
-              activeOptions={{ exact: item.to === "/" }}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const isHighlight = "highlight" in item && item.highlight;
+            if (isHighlight) {
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className="ml-2 px-4 py-2 text-sm font-extrabold uppercase tracking-wide rounded-full bg-gold-gradient text-[var(--gold-foreground)] shadow-gold hover:scale-105 transition-transform"
+                  activeProps={{ className: "ml-2 px-4 py-2 text-sm font-extrabold uppercase tracking-wide rounded-full bg-gold-gradient text-[var(--gold-foreground)] shadow-gold ring-2 ring-[var(--gold)]/60" }}
+                >
+                  {item.label}
+                </Link>
+              );
+            }
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="px-3 py-2 text-sm font-medium text-foreground/75 hover:text-primary rounded-md transition-colors"
+                activeProps={{ className: "px-3 py-2 text-sm font-semibold text-primary rounded-md bg-secondary" }}
+                activeOptions={{ exact: item.to === "/" }}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <Link
@@ -56,18 +71,33 @@ export function Header() {
       {open && (
         <div className="lg:hidden border-t border-border bg-background">
           <nav className="container-custom py-4 flex flex-col gap-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setOpen(false)}
-                className="px-3 py-3 text-base font-medium text-foreground/80 hover:text-primary hover:bg-secondary rounded-md"
-                activeProps={{ className: "px-3 py-3 text-base font-semibold text-primary bg-secondary rounded-md" }}
-                activeOptions={{ exact: item.to === "/" }}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const isHighlight = "highlight" in item && item.highlight;
+              if (isHighlight) {
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setOpen(false)}
+                    className="mt-2 px-4 py-3 text-base font-extrabold uppercase tracking-wide rounded-full bg-gold-gradient text-[var(--gold-foreground)] shadow-gold text-center"
+                  >
+                    {item.label}
+                  </Link>
+                );
+              }
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  className="px-3 py-3 text-base font-medium text-foreground/80 hover:text-primary hover:bg-secondary rounded-md"
+                  activeProps={{ className: "px-3 py-3 text-base font-semibold text-primary bg-secondary rounded-md" }}
+                  activeOptions={{ exact: item.to === "/" }}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       )}

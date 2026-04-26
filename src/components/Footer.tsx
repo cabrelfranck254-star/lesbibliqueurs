@@ -24,7 +24,7 @@ export function Footer() {
             <li><Link to="/participer" className="text-white/80 hover:text-[var(--gold)] transition">Devenir Bibliqueur</Link></li>
             <li><Link to="/billetterie" className="text-white/80 hover:text-[var(--gold)] transition">Billetterie</Link></li>
             <li><Link to="/competitions" className="text-white/80 hover:text-[var(--gold)] transition">Compétitions</Link></li>
-            <li><Link to="/dons" className="text-white/80 hover:text-[var(--gold)] transition">Offrandes</Link></li>
+            <li><Link to="/dons" className="text-[var(--gold)] font-bold hover:text-white transition">Faire une offrande ici</Link></li>
           </ul>
         </div>
 

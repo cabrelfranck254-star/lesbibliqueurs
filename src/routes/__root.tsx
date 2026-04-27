@@ -1,9 +1,7 @@
-import { Link, Outlet, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
-
-import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
   return (
@@ -28,47 +26,9 @@ function NotFoundComponent() {
 }
 
 export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Les Bibliqueurs — Émission chrétienne interactive" },
-      { name: "description", content: "L'émission chrétienne interactive basée sur les jeux et compétitions bibliques. Devenez Bibliqueur et participez en direct." },
-      { name: "author", content: "Les Bibliqueurs" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:title", content: "Les Bibliqueurs — Émission chrétienne interactive" },
-      { name: "twitter:title", content: "Les Bibliqueurs — Émission chrétienne interactive" },
-      { property: "og:description", content: "L'émission chrétienne interactive basée sur les jeux et compétitions bibliques. Devenez Bibliqueur et participez en direct." },
-      { name: "twitter:description", content: "L'émission chrétienne interactive basée sur les jeux et compétitions bibliques. Devenez Bibliqueur et participez en direct." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/8TmxZHrbmFMylTuf208w2v7UVMn2/social-images/social-1777050444674-1000059486.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/8TmxZHrbmFMylTuf208w2v7UVMn2/social-images/social-1777050444674-1000059486.webp" },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" },
-    ],
-  }),
-  shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
 });
-
-function RootShell({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="fr">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
 
 function RootComponent() {
   return (

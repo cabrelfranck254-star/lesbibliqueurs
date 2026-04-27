@@ -1,0 +1,11 @@
+# Netlify configuration for Les Bibliqueurs (SPA on TanStack Router + Vite)
+[build]
+  command = "bun run build"
+  publish = "dist"
+
+# SPA fallback so deep links (/participer, /dons, ...) work after refresh.
+# A `public/_redirects` file is also copied to dist/ as a backup.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

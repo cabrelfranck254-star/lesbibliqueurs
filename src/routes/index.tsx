@@ -24,10 +24,10 @@ function HomePage() {
       <section className="relative min-h-[92vh] flex items-center overflow-hidden">
         <img src={heroImg} alt="Bible ouverte sous des rayons de lumière dorés" className="absolute inset-0 w-full h-full object-cover" width={1920} height={1280} />
         <div className="absolute inset-0 bg-[var(--gradient-overlay)]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--navy-deep)]/90 via-[var(--navy-deep)]/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--navy-deep)]/80 via-[var(--navy-deep)]/60 to-[var(--navy-deep)]/80" />
 
         <div className="container-custom relative z-10 py-20">
-          <div className="max-w-3xl mx-auto lg:mx-0 text-center lg:text-left flex flex-col items-center lg:items-start">
+          <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur border border-[var(--gold)]/30 mb-4">
               <Sparkles className="h-4 w-4 text-[var(--gold)]" />
               <span className="text-xs uppercase tracking-[0.2em] text-[var(--gold-soft)]">Émission Chrétienne Interactive</span>
@@ -53,7 +53,7 @@ function HomePage() {
               et bien plus. Devenez un Bibliqueur, défiez votre connaissance des Écritures et brillez.
             </p>
 
-            <div className="flex flex-wrap justify-center lg:justify-start gap-4">
+            <div className="flex flex-wrap justify-center gap-4">
               <Link to="/participer" className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gold-gradient text-[var(--gold-foreground)] text-base font-bold shadow-gold hover:scale-105 transition-transform">
                 Devenir bibliqueur
               </Link>
@@ -65,7 +65,7 @@ function HomePage() {
               </Link>
             </div>
 
-            <div className="mt-12 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-white/85 text-sm">
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-white/85 text-sm">
               <div className="flex items-center gap-2"><Calendar className="h-4 w-4 text-[var(--gold)]" /> Dim. 24 mai 2026 · 16h–18h</div>
               <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-[var(--gold)]" /> Salle BC de Deido, Douala</div>
             </div>
